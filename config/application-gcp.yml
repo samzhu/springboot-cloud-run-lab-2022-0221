@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: dbuser
+    password: ${sm://lab_0221_db_password}
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 5
+      connection-timeout: 10000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  main:
+    banner-mode: off
+  cloud:
+    gcp:
+      project-id: ${lab_0221_gcp_project_id}  
+  redis:
+    database: 0
+    host: 10.116.0.3
+    port: 6378
+    password: ${sm://lab_0221_redis_password}
+    ssl: true
+  cache:
+    redis:
+      time-to-live: 600000
+
+logging:
+  level:
+    root: info
+    com.example.demo: info
+    com.zaxxer.hikari.pool.HikariPool: debug
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, mappings, prometheus
+  info:
+    git:
+      mode: simple
+  

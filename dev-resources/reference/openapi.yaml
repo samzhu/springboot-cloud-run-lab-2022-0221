@@ -1,0 +1,184 @@
+openapi: 3.0.3
+info:
+  title: book service
+  version: 1.0.0
+  description: 書籍服務
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0'
+  contact:
+    name: samzhu
+    url: 'https://blog.samzhu.dev/'
+    email: spike19820318@gmail.com
+servers:
+  - url: 'http://{domain}:{port}'
+    description: 伺服器URL
+    variables:
+      domain:
+        default: localhost
+        description: 開發環境
+      port:
+        default: '8080'
+        description: 開發環境
+paths:
+  /books:
+    post:
+      summary: 新增書本
+      operationId: create-books
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookViewDTO'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/ErrorResponse'
+      description: 建立書籍資料
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookCreateDTO'
+        description: 要新增的書籍資料
+      tags:
+        - Book
+components:
+  schemas:
+    ErrorMessage:
+      title: Root Type for ErrorMessage
+      description: 錯誤訊息
+      type: object
+      example:
+        timestamp: '2020-11-23T02:20:45.938+00:00'
+        status: 401
+        error: Unauthorized
+        message: 未授權存取
+        path: /employees
+        errors:
+          - defaultMessage: 值 需介於 1 到 2 之間
+            objectName: createDto
+            field: accessLimit
+            rejectedValue: 3
+            bindingFailure: false
+            code: Range
+      properties:
+        timestamp:
+          format: date-time
+          type: string
+        status:
+          format: int32
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorMessageDetail'
+    ErrorMessageDetail:
+      title: Root Type for ErrorMessageDetail
+      description: 錯誤明細
+      type: object
+      properties:
+        defaultMessage:
+          type: string
+        objectName:
+          type: string
+        field:
+          type: string
+        rejectedValue:
+          format: int32
+          type: integer
+        bindingFailure:
+          type: boolean
+        code:
+          type: string
+      example:
+        defaultMessage: 值 需介於 1 到 2 之間
+        objectName: createDto
+        field: accessLimit
+        rejectedValue: 3
+        bindingFailure: false
+        code: Range
+    BookCreateDTO:
+      title: BookCreateDTO
+      type: object
+      description: 書籍建立資料
+      properties:
+        id:
+          type: integer
+          description: 編號
+        title:
+          type: string
+          maxLength: 20
+          description: 書名
+        description:
+          type: string
+          maxLength: 50
+          description: 說明
+      required:
+        - id
+        - title
+        - description
+      x-examples:
+        example-1:
+          id: 1234877
+          title: 從入門到放棄
+          description: 先教你入門
+    BookViewDTO:
+      title: BookCreateDTO
+      type: object
+      description: 書籍檢視資料
+      x-examples:
+        example-1:
+          id: 1234877
+          title: 從入門到放棄
+          description: 先教你入門
+          createdBy: 236697
+          createdDate: '1645684692441'
+      properties:
+        id:
+          type: integer
+          description: 編號
+        title:
+          type: string
+          maxLength: 20
+          description: 書名
+        description:
+          type: string
+          maxLength: 50
+          description: 說明
+        created_by:
+          type: string
+          description: 建檔人員
+        created_date:
+          type: string
+          description: 建立時間
+      required:
+        - id
+        - title
+        - description
+        - created_by
+  responses:
+    ErrorResponse:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+      description: 錯誤通用回覆
+  securitySchemes:
+    JWT:
+      scheme: bearer
+      type: http
+      description: JWT 格式 Token
+  parameters: {}
+tags:
+  - name: Book

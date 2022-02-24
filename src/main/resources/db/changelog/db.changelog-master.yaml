@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: history/changelog-2022-0222-001.yaml
+      relativeToChangelogFile: true
+      description: 短網址表格

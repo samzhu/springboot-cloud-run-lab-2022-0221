@@ -1,0 +1,49 @@
+databaseChangeLog:
+- changeSet:
+    id: 1645583593683-1
+    author: samzhu (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              primaryKey: true
+              primaryKeyName: book_pk
+            name: id
+            remarks: primary key
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: title
+            remarks: title
+            type: VARCHAR(20)
+        - column:
+            constraints:
+              nullable: false
+            name: description
+            remarks: description
+            type: VARCHAR(50)
+        - column:
+            constraints:
+              nullable: false
+            name: created_by
+            remarks: Who create
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            defaultValueComputed: CURRENT_TIMESTAMP
+            name: created_date
+            remarks: Create date
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            name: last_modified_by
+            remarks: Who modify
+            type: BIGINT
+        - column:
+            defaultValueComputed: CURRENT_TIMESTAMP
+            name: last_modified_date
+            remarks: Modify date
+            type: TIMESTAMP WITHOUT TIME ZONE
+        tableName: book

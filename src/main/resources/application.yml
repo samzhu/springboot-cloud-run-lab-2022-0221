@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: spring-boot-app
+  sleuth:
+    sampler:
+      probability: 1.0
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher # https://github.com/springfox/springfox/issues/3934
+  profiles:
+    active:
+    - dev
+
+server:
+  shutdown: graceful
+  error:
+    include-message: always
+    include-binding-errors: always
+
+logging:
+  level:
+    root: info
+
+management:
+  server:
+    port: 9000
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, mappings, prometheus
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  info:
+    git:
+      mode: simple
+
