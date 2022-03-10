@@ -163,7 +163,7 @@ public class OpenAPIConfig {
   private List<SecurityScheme> securitySchemes() {
     GrantType grantType = new ResourceOwnerPasswordCredentialsGrant("/oauth/token");
 
-    List<SecurityScheme> securitySchemes = new ArrayList();
+    List<SecurityScheme> securitySchemes = new ArrayList<SecurityScheme>();
 
     OAuth oAuth =
         new OAuthBuilder()

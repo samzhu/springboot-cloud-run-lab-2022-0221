@@ -79,7 +79,7 @@ dependencies {
 	// mapstruct
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
 	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-	// Swagger
+	// Swagger (TODO: Change to Springdoc-openapi)
 	implementation "io.springfox:springfox-boot-starter:${springfoxVersion}"
 	implementation "io.springfox:springfox-swagger-ui:${springfoxVersion}"
 	implementation "io.springfox:springfox-data-rest:${springfoxVersion}"
@@ -110,7 +110,7 @@ spotless {
 	encoding 'UTF-8' // all formats will be interpreted as UTF-8
 	java {
 		target 'src/**/*.java'
-		toggleOffOn()
+		toggleOffOn('@formatter:off','@formatter:on') // 原本 spotless:off, spotless:on
 		googleJavaFormat()
 		removeUnusedImports()
 		importOrder()
@@ -136,10 +136,11 @@ jacocoTestReport {
 	dependsOn test
 	reports {
 		// sonar analysis equired
-		xml.enabled true
-		csv.enabled true
-		html.enabled true
+		xml.required.set(true)
+		csv.required.set(true)
+		html.required.set(true)
 	}
+
 }
 
 openApiGenerate {
@@ -174,7 +175,9 @@ openApiGenerate {
 		unhandledException: "true", // Declare operation methods to throw a generic exception and allow unhandled exceptions
 		useTags: "true", // use tags for creating interface and controller classnames
 		useOptional: "true",
-		skipOverwrite: "true"
+		skipOverwrite: "true",
+		skipDefaultInterface: "true"
+		// responseWrapper: "CompletableFuture"
 	]
 }
 
@@ -184,4 +187,37 @@ tasks.openApiGenerate {
 				"${openapiOutputDir}/.openapi-generator"
 				)
 	}
+}
+
+// ./gradlew convertSwagger2markup
+// 產生到 asciidoc 下 definitions.adoc overview.adoc paths.adoc security.adoc
+convertSwagger2markup {
+	swaggerInput file("${apiDocPath}").getAbsolutePath()
+	outputFile file("${buildDir}/swagger/api")
+	// outputDir file("index")
+	config = [
+		'swagger2markup.markupLanguage'          : 'ASCIIDOC',
+		'swagger2markup.pathsGroupedBy'          : 'TAGS',
+		'swagger2markup.outputLanguage'          : 'EN',
+		'swagger2markup.generatedExamplesEnabled': true,
+		'swagger2markup.inlineSchemaEnabled'     : false
+	]
+}
+
+// ./gradlew asciidoctor
+asciidoctor {
+	sourceDir file("${buildDir}/swagger")
+	sources {
+		include 'api.adoc'
+	}
+	attributes 'doctype': 'book',
+	'icons': 'font',
+	'source-highlighter': 'highlightjs',
+	'toc': 'left',
+	'toclevels': 2,
+	'sectlinks': true
+	outputOptions {
+		backends = ['html5', 'pdf']
+	}
+	outputDir file('publish')
 }

@@ -6,7 +6,7 @@ spring:
       probability: 1.0
   mvc:
     pathmatch:
-      matching-strategy: ant-path-matcher # https://github.com/springfox/springfox/issues/3934
+      matching-strategy: ant-path-matcher # springfox 問題 https://github.com/springfox/springfox/issues/3934
   profiles:
     active:
     - dev

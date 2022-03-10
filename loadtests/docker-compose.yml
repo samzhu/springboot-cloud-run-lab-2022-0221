@@ -1,0 +1,85 @@
+version: '3.8'
+services:
+
+  postgres:
+    image: 'postgres:14.2'
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: 'user1'
+      POSTGRES_PASSWORD: 'pw123456'
+      POSTGRES_DB: 'testdb'
+    networks:
+      - privateBridge
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: 20m
+        max-file: '2'
+
+  redis:
+    image: 'redis:6.2.6'
+    restart: always
+    command: >
+          --requirepass "pw123456"
+    ports:
+      - '6379:6379'
+    networks:
+      - privateBridge
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '2'
+
+  app:
+    image: "book:0.0.1-SNAPSHOT"
+    environment:
+      spring.profiles.active : 'loadtests'
+      spring.cloud.gcp.secretmanager.enabled : 'false'
+    ports:
+      - '8080:8080'
+      - '9000:9000'
+    volumes:
+      - $PWD/config/:/workspace/config/
+    networks:
+      - privateBridge
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    logging:
+      driver: json-file
+      options:
+        max-size: 20m
+        max-file: '2'
+
+  k6:
+    image: "grafana/k6"
+    command: run /scripts/performance-test.js
+    ports:
+      - '6565:6565'
+    volumes:
+      - $PWD/loadtests:/scripts
+    networks:
+      - privateBridge
+    logging:
+      driver: json-file
+      options:
+        max-size: 20m
+        max-file: '2'
+
+networks:
+  privateBridge:
+    driver: bridge
