@@ -41,14 +41,14 @@ bin/
 # SpringBoot Config #
 **/application-*.yml
 !config/application-dev.yml
-!config/application-dev-secret.yml
 !config/application-unittest.yml
+!config/application-loadtests.yml
 !config/application-gcp.yml
 
 **/application-*.properties
 !config/application-dev.properties
-!config/application-dev-secret.properties
 !config/application-unittest.properties
+!config/application-loadtests.properties
 !config/application-gcp.properties
 
 # Mac #
