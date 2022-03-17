@@ -1,13 +1,13 @@
 // 引用必要套件
 import { check, sleep } from 'k6';
 import http from 'k6/http';
+import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
+// https://github.com/benc-uk/k6-reporter
 
 export default function () {
 
   // 可以定義變數供後續使用
   const url = 'http://app:9000/actuator/health/readiness';
-
-  sleep(30 * 1000);
   
   // 直接就對目標 url 發動測試
   const result = http.get(url);
@@ -32,3 +32,9 @@ export const options = {
     http_req_duration: ['p(95)<500'], 
   },
 };
+
+export function handleSummary(data) {
+  return {
+    "/report/summary.html": htmlReport(data),
+  };
+}

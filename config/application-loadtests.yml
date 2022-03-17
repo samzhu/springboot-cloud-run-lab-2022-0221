@@ -48,8 +48,5 @@ management:
   info:
     git:
       mode: full
-  metrics:
-    export:
-      stackdriver:
-        projectId: "123456"
+
   

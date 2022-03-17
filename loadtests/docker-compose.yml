@@ -65,13 +65,38 @@ services:
         max-size: 20m
         max-file: '2'
 
+  app-test:
+    image: "alpine:latest"
+    command: "sh /scripts/healthcheck.sh"
+    volumes:
+      - $PWD/loadtests/app-test:/scripts
+    networks:
+      - privateBridge
+    logging:
+      driver: json-file
+      options:
+        max-size: 20m
+        max-file: '2'
+
   k6:
     image: "grafana/k6"
     command: run /scripts/performance-test.js
     ports:
       - '6565:6565'
     volumes:
-      - $PWD/loadtests:/scripts
+      - $PWD/loadtests/k6:/scripts
+      - $PWD/loadtests/report:/report
+    networks:
+      - privateBridge
+    logging:
+      driver: json-file
+      options:
+        max-size: 20m
+        max-file: '2'
+
+  curl:
+    image: "curlimages/curl:7.82.0"
+    command: -L -v http://app:9000/actuator/health/readiness
     networks:
       - privateBridge
     logging:

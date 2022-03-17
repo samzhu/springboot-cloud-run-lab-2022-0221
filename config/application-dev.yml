@@ -17,8 +17,6 @@ spring:
         enabled: false
       sql:
         enabled: false
-      secretmanager:
-        enabled: false
       metrics:
         enabled: false
       trace:
