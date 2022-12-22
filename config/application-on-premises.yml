@@ -1,0 +1,49 @@
+spring:
+  autoconfigure:
+    exclude:
+    - org.springframework.boot.actuate.autoconfigure.metrics.export.stackdriver.StackdriverMetricsExportAutoConfiguration
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${db_url}
+    username: ${db_username}
+    password: ${db_password}
+  jpa:
+    show-sql: true
+  main:
+    banner-mode: console
+  cloud:
+    gcp:
+      core:
+        enabled: false
+      sql:
+        enabled: false
+      metrics:
+        enabled: false
+      trace:
+        enabled: false
+      logging:
+        enabled: false
+  redis:
+    host: ${redis_host}
+    port: 6378
+    password: ${redis_password}
+    ssl: false
+  cache:
+    redis:
+      time-to-live: 600000 # Configure default TTL, e.g., 10 minutes
+
+logging:
+  level:
+    root: info
+
+management:
+  server:
+    port: 8080
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  info:
+    git:
+      mode: full
+  

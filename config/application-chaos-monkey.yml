@@ -1,0 +1,27 @@
+management:
+  endpoint:
+    chaosmonkey:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include:
+          - 'health'
+          - 'info'
+          - 'chaosmonkey'
+
+chaos:
+  monkey:
+    enabled: true
+    watcher:
+      controller: true
+      rest-controller: true
+      service: false
+      repository: false
+      component: false
+    assaults:
+      level: 5
+      latency-active: true
+      exceptions-active: true
+      kill-application-active: false
+      memory-active: false
