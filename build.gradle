@@ -1,15 +1,17 @@
 plugins {
-	id 'org.springframework.boot' version '2.6.4'
+	id 'org.springframework.boot' version '2.6.6'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
 	id 'maven-publish'
 	id 'jacoco'
 	// git info
+	// https://plugins.gradle.org/plugin/com.gorylenko.gradle-git-properties
 	id 'com.gorylenko.gradle-git-properties' version '2.4.0'
 	// coding style
 	// https://github.com/diffplug/spotless/blob/main/plugin-gradle/README.md
+	// https://plugins.gradle.org/plugin/com.diffplug.spotless
 	// ./gradlew spotlessApply
-	id 'com.diffplug.spotless' version '6.3.0'
+	id 'com.diffplug.spotless' version '6.4.2'
 	// openapi generator
 	// https://plugins.gradle.org/plugin/org.openapi.generator
 	// ./gradlew openApiValidate & ./gradlew openApiGenerate
@@ -41,9 +43,12 @@ ext {
 	set('commonslang3Version', "3.12.0")
 	set('mapstructVersion', "1.4.2.Final")
 	set('springfoxVersion', "3.0.0")
+	set('springdocVersion', "1.6.6")
 	// OpenAPI
 	set('openapiInputSpec', "${rootDir}/dev-resources/reference/openapi.yaml")
 	set('openapiOutputDir', "${rootDir}")
+	// set('openapiOutputDir', "${rootDir}/generated/springboot")
+	set('openapiTemplateDir', "${rootDir}/dev-resources/template")
 	set('openapiInvokerPackage', "${group}")
 	set('openapiApiPackage', "${openapiInvokerPackage}.${rootProject.name}.interfaces.rest")
 	set('openapiModelPackage', "${openapiInvokerPackage}.${rootProject.name}.interfaces.rest.dto")
@@ -54,39 +59,45 @@ ext {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	// implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	// implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+	// implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'com.google.cloud:spring-cloud-gcp-starter'
-	implementation 'org.liquibase:liquibase-core'
+	// implementation 'com.google.cloud:spring-cloud-gcp-starter'
+	// implementation 'org.liquibase:liquibase-core'
 	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
-	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 	runtimeOnly 'org.postgresql:postgresql'
+	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.testcontainers:junit-jupiter'
 	testImplementation 'org.testcontainers:postgresql'
 	// Add
-	implementation 'com.google.cloud:spring-cloud-gcp-starter-sql-postgresql'
-	implementation 'com.google.cloud:spring-cloud-gcp-starter-trace'
-	implementation 'com.google.cloud:spring-cloud-gcp-starter-secretmanager'
-	implementation 'com.google.cloud:spring-cloud-gcp-starter-metrics'
-	implementation 'com.google.cloud:spring-cloud-gcp-starter-logging'
+	// implementation 'com.google.cloud:spring-cloud-gcp-starter-sql-postgresql'
+	// implementation 'com.google.cloud:spring-cloud-gcp-starter-trace'
+	// implementation 'com.google.cloud:spring-cloud-gcp-starter-secretmanager'
+	// implementation 'com.google.cloud:spring-cloud-gcp-starter-metrics'
+	// implementation 'com.google.cloud:spring-cloud-gcp-starter-logging'
 	// Tool
 	implementation "org.apache.commons:commons-lang3:${commonslang3Version}"
 	// mapstruct
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
 	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-	// Swagger (TODO: Change to Springdoc-openapi)
-	implementation "io.springfox:springfox-boot-starter:${springfoxVersion}"
-	implementation "io.springfox:springfox-swagger-ui:${springfoxVersion}"
-	implementation "io.springfox:springfox-data-rest:${springfoxVersion}"
+	// OpenAPI (TODO: Change to Springdoc-openapi)
+	// implementation "io.springfox:springfox-boot-starter:${springfoxVersion}"
+	// implementation "io.springfox:springfox-swagger-ui:${springfoxVersion}"
+	// implementation "io.springfox:springfox-data-rest:${springfoxVersion}"
+	implementation "org.springdoc:springdoc-openapi-ui:${springdocVersion}"
+	// implementation "org.springdoc:springdoc-openapi-hateoas:${springdocVersion}"
+	// implementation "org.springdoc:springdoc-openapi-data-rest:${springdocVersion}"
+	// implementation "org.springdoc:springdoc-openapi-security:${springdocVersion}"
 	// UnitTest
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
+
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }
 
 dependencyManagement {
@@ -101,6 +112,15 @@ tasks.named('test') {
 	useJUnitPlatform()
 	systemProperty 'apiDocPath', "${apiDocPath}"
 	testLogging.showStandardStreams = true
+}
+
+// tasks.named("bootBuildImage") {
+// 	buildpacks = ["urn:cnb:builder:paketo-buildpacks/java"]
+// }
+
+// https://paketo.io/docs/howto/java/#use-an-alternative-jvm
+tasks.named("bootBuildImage") {
+	buildpacks = ["gcr.io/paketo-buildpacks/microsoft-openjdk", "urn:cnb:builder:paketo-buildpacks/java"]
 }
 
 gitProperties {
@@ -149,7 +169,7 @@ openApiGenerate {
 	library = "spring-boot"
 	inputSpec = "${openapiInputSpec}"
 	outputDir = "${openapiOutputDir}"
-	// templateDir = "${openapiTemplateDir}"
+	templateDir = "${openapiTemplateDir}"
 	invokerPackage = "${openapiInvokerPackage}"
 	apiPackage = "${openapiApiPackage}"
 	modelPackage = "${openapiModelPackage}"
@@ -176,7 +196,7 @@ openApiGenerate {
 		unhandledException: "true", // Declare operation methods to throw a generic exception and allow unhandled exceptions
 		useTags: "true", // use tags for creating interface and controller classnames
 		useOptional: "true",
-		skipOverwrite: "true",
+		skipOverwrite: "false",
 		skipDefaultInterface: "true"
 		// responseWrapper: "CompletableFuture"
 	]
@@ -221,4 +241,55 @@ asciidoctor {
 		backends = ['html5', 'pdf']
 	}
 	outputDir file('publish')
+}
+
+// ./gradlew buildAngularClient
+task buildAngularClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask){
+	generatorName = "typescript-angular"
+	inputSpec = "${openapiInputSpec}"
+	outputDir = "${rootDir}/generated/client/angular".toString()
+}
+
+task buildGoClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask){
+	generatorName = "go"
+	inputSpec = "${openapiInputSpec}"
+	outputDir = "${rootDir}/generated/client/go".toString()
+}
+
+task buildFeignClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask){
+	generatorName = "spring"
+	library= "spring-cloud"
+	inputSpec = "${openapiInputSpec}"
+	outputDir = "${rootDir}/generated/client/feign".toString()
+	templateDir = "${openapiTemplateDir}"
+	invokerPackage = "${openapiInvokerPackage}"
+	apiPackage = "${openapiApiPackage}"
+	modelPackage = "${openapiModelPackage}"
+	typeMappings = [
+		set: 'List'
+	]
+	instantiationTypes = [
+		set: 'ArrayList'
+	]
+	importMappings = [
+		LinkedHashSet: 'java.util.ArrayList'
+	]
+	configOptions = [
+		configPackage: "${openapiConfigPackage}",
+		dateLibrary: "java8",
+		openApiNullable: "false",
+		disallowAdditionalPropertiesIfNotPresent: "false",
+		groupId: "${group}",
+		hateoas: "false",
+		interfaceOnly: "true",
+		licenseName: "Unlicense",
+		singleContentTypes: "true", // Whether to select only one produces/consumes content-type by operation.
+		title: "${rootProject.name}",
+		unhandledException: "true", // Declare operation methods to throw a generic exception and allow unhandled exceptions
+		useTags: "true", // use tags for creating interface and controller classnames
+		useOptional: "true",
+		skipOverwrite: "false",
+		skipDefaultInterface: "true"
+		// responseWrapper: "CompletableFuture"
+	]
 }

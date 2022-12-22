@@ -1,7 +1,6 @@
 spring:
   autoconfigure:
     exclude:
-    - com.google.cloud.spring.autoconfigure.core.GcpContextAutoConfiguration
     - org.springframework.boot.actuate.autoconfigure.metrics.export.stackdriver.StackdriverMetricsExportAutoConfiguration
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -14,8 +13,6 @@ spring:
       core:
         enabled: false
       sql:
-        enabled: false
-      secretmanager:
         enabled: false
       metrics:
         enabled: false

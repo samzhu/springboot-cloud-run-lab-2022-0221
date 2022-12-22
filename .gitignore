@@ -41,15 +41,16 @@ bin/
 # SpringBoot Config #
 **/application-*.yml
 !config/application-dev.yml
+!config/application-gcp.yml
 !config/application-unittest.yml
 !config/application-loadtests.yml
-!config/application-gcp.yml
 
 **/application-*.properties
 !config/application-dev.properties
+!config/application-gcp.properties
 !config/application-unittest.properties
 !config/application-loadtests.properties
-!config/application-gcp.properties
+
 
 # Mac #
 .DS_Store
@@ -63,3 +64,6 @@ pom.xml
 # whitesource #
 /whitesource/
 wss-unified-agent.jar
+
+# K6 #
+summary.html

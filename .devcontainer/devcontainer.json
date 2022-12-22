@@ -22,16 +22,25 @@
 	
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
-		"vscjava.vscode-java-pack",
-		"Pivotal.vscode-boot-dev-pack",
+		// IDE
+		"MS-CEINTL.vscode-language-pack-zh-hant",
+		// Java
+		"vscjava.vscode-java-pack", "GabrielBB.vscode-lombok", "Pivotal.vscode-boot-dev-pack",
+		"shengchen.vscode-checkstyle",
 		"richardwillis.vscode-gradle-extension-pack",
-		"GabrielBB.vscode-lombok",
-		"ms-azuretools.vscode-docker",
-		"redhat.fabric8-analytics",
+		// Coding Helper
+		"VisualStudioExptTeam.vscodeintellicode", "GitHub.copilot",
+		// Markdown
+		"yzhang.markdown-all-in-one", "DavidAnson.vscode-markdownlint", "shd101wyy.markdown-preview-enhanced",
+		// Tools
+		"ms-azuretools.vscode-docker", "jebbs.plantuml", "hediet.vscode-drawio", "42Crunch.vscode-openapi",
+		"mhutchie.git-graph", "eamodio.gitlens",
+		// Security
+		"redhat.fabric8-analytics", 
+		// Quality
 		"sonarsource.sonarlint-vscode",
-		"jebbs.plantuml",
-		"shd101wyy.markdown-preview-enhanced",
-		"hediet.vscode-drawio"
+		// Other
+		"PKief.material-icon-theme", "GitHub.copilot"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.

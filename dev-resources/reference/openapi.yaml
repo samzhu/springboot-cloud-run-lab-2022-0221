@@ -21,10 +21,10 @@ servers:
         default: '8080'
         description: 開發環境
 paths:
-  /books:
+  /v1/books:
     post:
-      summary: 新增書本
-      operationId: create-books
+      summary: Create Book
+      operationId: createBook
       responses:
         '201':
           description: Created
@@ -32,12 +32,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BookViewDTO'
-        '400':
-          $ref: '#/components/responses/ErrorResponse'
-        '401':
-          $ref: '#/components/responses/ErrorResponse'
-        '500':
-          $ref: '#/components/responses/ErrorResponse'
+          links:
+            GetBookByBookId:
+              operationId: getBookByBookId
+              parameters:
+                bookId: $response.body#/id
+              description: |
+                The `id` value returned in the response can be used as the `bookId` parameter in `GET /books/{bookId}`.
       description: 建立書籍資料
       requestBody:
         content:
@@ -47,6 +48,38 @@ paths:
         description: 要新增的書籍資料
       tags:
         - Book
+    get:
+      summary: Get Books
+      operationId: getBooks
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookViewDTO'
+      description: 取得所有書籍
+      tags:
+        - Book
+    parameters: []
+  '/v1/books/{bookId}':
+    parameters:
+      - $ref: '#/components/parameters/bookId'
+    get:
+      summary: Your GET endpoint
+      tags:
+        - Book
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookViewDTO'
+      operationId: getBookByBookId
+      description: 取得單一書籍
 components:
   schemas:
     ErrorMessage:
@@ -134,7 +167,7 @@ components:
           title: 從入門到放棄
           description: 先教你入門
     BookViewDTO:
-      title: BookCreateDTO
+      title: BookViewDTO
       type: object
       description: 書籍檢視資料
       x-examples:
@@ -162,6 +195,7 @@ components:
         created_date:
           type: string
           description: 建立時間
+          format: date-time
       required:
         - id
         - title
@@ -179,6 +213,13 @@ components:
       scheme: bearer
       type: http
       description: JWT 格式 Token
-  parameters: {}
+  parameters:
+    bookId:
+      name: bookId
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: 書籍ID
 tags:
   - name: Book

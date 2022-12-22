@@ -1,0 +1,62 @@
+stages:
+  - build
+  - test
+
+variables:
+  GRADLE_IMAGE: "gradle:latest"
+  GRADLE_USER_HOME: $CI_PROJECT_DIR/.gradle
+
+.gradle-scripts: &gradle-scripts |
+  # BEGSCRIPT
+  set -e
+
+  function log_info() {
+      echo -e "[\\e[1;94mINFO\\e[0m] $*"
+  }
+
+  function log_warn() {
+      echo -e "[\\e[1;93mWARN\\e[0m] $*"
+  }
+
+  function log_error() {
+      echo -e "[\\e[1;91mERROR\\e[0m] $*"
+  }
+
+  # ENDSCRIPT
+
+.gradle-base:
+  image: $GRADLE_IMAGE
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-gradle"
+    paths:
+      - .gradle
+  before_script:
+    - *gradle-scripts
+
+gradle-build:
+  extends: .gradle-base
+  stage: build
+  script:
+    - append_jacoco_task jacocoTestReport
+    - append_jacoco_task jacocoTestCoverageVerification
+    - $GRADLE_CLI_BIN $GRADLE_CLI_OPTS $GRADLE_BUILD_ARGS
+    - output_jacoco_coverage
+  rules:
+    # exclude merge requests
+    - if: '$CI_MERGE_REQUEST_ID == null'
+  # code coverage RegEx
+  coverage: '/^(\d+.\d+\%) covered$/'
+  artifacts:
+    name: "$CI_JOB_NAME artifacts from $CI_PROJECT_NAME on $CI_COMMIT_REF_SLUG"
+    expire_in: 1 day
+    when: always
+    reports:
+      junit:
+        - "$GRADLE_PROJECT_DIR/**/build/test-results/test/TEST-*.xml"
+    paths:
+      - "$GRADLE_PROJECT_DIR/**/build/"
+
+
+
+
+
